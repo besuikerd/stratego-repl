@@ -68,7 +68,6 @@ public class StrategoToJBCCompiler implements IStrategoCompiler {
     private void compileStratego(IStrategoRule rule) throws CompilationException {
         File src = new File(compilationPath.getPath().toFile(), rule.getIdentity() + ".str");
         String[] args = new String[]{"-i", src.getAbsolutePath()};
-
         try{
             context.invokeStrategyCLI(main_strj_0_0.instance, "Main", args);
         } catch(StrategoExit e){

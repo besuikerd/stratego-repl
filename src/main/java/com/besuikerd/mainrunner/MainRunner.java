@@ -59,7 +59,6 @@ public class MainRunner {
     public void addToClassPath(String path) throws MalformedURLException{
         if(!path.matches("^file://")) path = "file://" + path.replaceAll("\\\\", "/");
         if(!path.endsWith("/")) path = path + "/";
-        System.out.println(path + "term_0.str");
         this.loader = URLClassLoader.newInstance(new URL[]{new URL(path)}, loader);
     }
 
