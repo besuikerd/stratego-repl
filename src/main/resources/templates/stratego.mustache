@@ -1,0 +1,17 @@
+module {{moduleName}}
+
+imports
+{{# imports }}
+  {{toString}}
+{{/imports}}
+
+signature
+
+sorts
+  Option(a)
+constructors
+  Some: a -> Option(a)
+  None: Option(a)
+
+rules
+  main = {{{rule}}}

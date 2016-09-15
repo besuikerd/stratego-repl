@@ -1,0 +1,7 @@
+imports:
+  - libstratego-lib
+  - libstratego-sglr
+  - libstratego-gpp
+  - libstratego-xtc
+  - libstratego-aterm
+  - libstratego-sdf
