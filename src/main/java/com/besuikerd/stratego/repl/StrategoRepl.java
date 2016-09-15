@@ -42,38 +42,9 @@ public class StrategoRepl implements IStrategoRepl {
             System.out.println(term.getStringRepresentation());
             history.store(term);
         } catch (CompilationException e) {
-            e.printStackTrace();
+            System.err.println(e.getMessage());
         } catch (StrategoExecutionException e) {
-            e.printStackTrace();
+            System.err.println(e.getMessage());
         }
     }
-
-//            String moduleName = "term_" + term++;
-//
-//            StrategoTemplateContext templateContext = new StrategoTemplateContext(config.getImports(), rule, moduleName);
-//
-//            File src = new File(path.toFile(), moduleName + ".str");
-//            Writer writer = new OutputStreamWriter(new FileOutputStream(src));
-//            template.execute(writer, templateContext);
-//            writer.close();
-//
-//            try{
-//                invoke(src);
-//            } catch(ExecutionException e){
-//                try{
-//                    throw e.getCause();
-//                } catch(StrategoExit e2){
-//                    if(e2.getValue() == 0){
-//                        System.out.println("Great success!");
-//                    } else{
-//                        System.out.println("Great failure!");
-//                    }
-//                } catch(Throwable e2){
-//                    e.printStackTrace();
-//                }
-//            } catch(StrategoExit e){
-//                System.out.println("Compilation error");
-//            }
-//        }
-//    }
 }

@@ -28,11 +28,11 @@ public class ReplModule extends AbstractModule{
     @Override
     protected void configure() {
         bind(IStrategoRepl.class).to(StrategoRepl.class);
-        bind(IStrategoCompiler.class).to(StrategoToJBCCompiler.class);
-        bind(IStrategoExecuter.class).to(StrategoExecuter.class);
-        bind(ITermHistory.class).to(TermHistory.class);
-        bind(ICompilationPath.class).to(TemporyFilePath.class);
-        bind(MustacheFactory.class).to(DefaultMustacheFactory.class);
+        bind(IStrategoCompiler.class).to(StrategoToJBCCompiler.class).in(Singleton.class);
+        bind(IStrategoExecuter.class).to(StrategoExecuter.class).in(Singleton.class);
+        bind(ITermHistory.class).to(TermHistory.class).in(Singleton.class);
+        bind(ICompilationPath.class).to(TemporyFilePath.class).in(Singleton.class);
+        bind(MustacheFactory.class).to(DefaultMustacheFactory.class).in(Singleton.class);
     }
 
     @Provides

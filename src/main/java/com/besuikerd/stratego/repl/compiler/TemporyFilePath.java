@@ -13,7 +13,8 @@ public class TemporyFilePath implements ICompilationPath {
     private final Path path;
 
     public TemporyFilePath() throws IOException {
-        this.path = Files.createTempDirectory("spoofax-repl");
+        this.path = Files.createTempDirectory("stratego-repl");
+        System.out.println(path.toUri());
     }
 
     @Override

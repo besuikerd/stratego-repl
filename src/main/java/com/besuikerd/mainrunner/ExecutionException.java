@@ -24,7 +24,7 @@ public class ExecutionException extends Exception{
     }
 
     @Override
-    public synchronized Throwable getCause() {
+    public Throwable getCause() {
         return throwable;
     }
 

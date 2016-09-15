@@ -29,9 +29,11 @@ public class StrategoExecuter implements IStrategoExecuter{
     @Override
     public IStrategoTerm execute(ICompiledStrategoRule rule) throws StrategoExecutionException {
         PrintStream systemOut = System.out;
+        PrintStream systemErr = System.err;
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try {
             System.setOut(new PrintStream(bos));
+            System.setErr(new PrintStream(bos));
             runner.tryMain(rule.getIdentity());
             return new StrategoTerm(new String(bos.toByteArray()));
         } catch (ExecutionException|ClassFunctionException e) {
@@ -39,9 +41,10 @@ public class StrategoExecuter implements IStrategoExecuter{
                 throw e.getCause();
             } catch(StrategoExit exit){
                 if(exit.getValue() != 0){
-                    throw new StrategoExecutionException(exit.getMessage());
+                    String message = exit.getMessage().startsWith("Legal exit") ? new String(bos.toByteArray()) : exit.getMessage();
+                    throw new StrategoExecutionException(message);
                 } else{
-                    String term = new String(bos.toByteArray());
+                    String term = new String(bos.toByteArray()).trim();
                     return new StrategoTerm(term);
                 }
             } catch(Throwable e2){
@@ -49,6 +52,7 @@ public class StrategoExecuter implements IStrategoExecuter{
             }
         } finally{
             System.setOut(systemOut);
+            System.setErr(systemErr);
         }
     }
 

@@ -4,7 +4,10 @@ import com.besuikerd.stratego.repl.history.ITermHistory;
 import com.besuikerd.stratego.repl.rule.CompiledStrategoRule;
 import com.besuikerd.stratego.repl.rule.ICompiledStrategoRule;
 import com.besuikerd.stratego.repl.rule.IStrategoRule;
+import com.besuikerd.stratego.repl.rule.StrategoRule;
 import com.besuikerd.stratego.repl.template.IStrategoTemplate;
+import com.besuikerd.stratego.repl.term.IStrategoTerm;
+import org.spoofax.interpreter.library.IOAgent;
 import org.strategoxt.lang.Context;
 import org.strategoxt.lang.StrategoExit;
 import org.strategoxt.strj.main_strj_0_0;
@@ -12,6 +15,8 @@ import org.strategoxt.strj.main_strj_0_0;
 import javax.inject.Inject;
 import javax.tools.JavaCompiler;
 import java.io.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 
 public class StrategoToJBCCompiler implements IStrategoCompiler {
@@ -37,10 +42,13 @@ public class StrategoToJBCCompiler implements IStrategoCompiler {
         this.history = history;
         this.template = template;
         this.context = context;
+        makeStdErrWriterNonFinal();
+        makeStdOutWriterNonFinal();
     }
 
     @Override
     public ICompiledStrategoRule compile(IStrategoRule rule) throws CompilationException {
+        rule = prependHistory(rule);
         writeStrategoFile(rule);
         compileStratego(rule);
         replaceExitClauses(rule);
@@ -48,11 +56,17 @@ public class StrategoToJBCCompiler implements IStrategoCompiler {
         return new CompiledStrategoRule(rule);
     }
 
+    private IStrategoRule prependHistory(IStrategoRule rule){
+        String prefix = history.hasTerms() ? "!" + history.last().getStringRepresentation() + " ; " : "";
+        return new StrategoRule(prefix + rule.getStringRepresentation(), rule.getIdentity());
+    }
+
     private void writeStrategoFile(IStrategoRule rule) throws CompilationException {
         File destination = new File(compilationPath.getPath().toFile(), rule.getIdentity() + ".str");
-        try {
+        try(
             BufferedInputStream is = new BufferedInputStream(template.writeTemplate(rule));
             BufferedOutputStream os = new BufferedOutputStream(new FileOutputStream(destination));
+        ) {
             byte[] buff = new byte[1024];
             int n = -1;
             while((n = is.read(buff)) != -1){
@@ -65,16 +79,68 @@ public class StrategoToJBCCompiler implements IStrategoCompiler {
         }
     }
 
+    private void makeFieldNonFinal(Object obj, String name){
+        Class<?> cls = obj.getClass();
+        try {
+            Field f = cls.getDeclaredField(name);
+            f.setAccessible(true);
+            Field fmodifiers = Field.class.getDeclaredField("modifiers");
+            fmodifiers.setAccessible(true);
+            fmodifiers.setInt(f, f.getModifiers() & ~Modifier.FINAL);
+        } catch (IllegalAccessException|NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void makeStdErrWriterNonFinal(){
+        makeFieldNonFinal(context.getIOAgent(), "stderrWriter");
+    }
+
+    private void makeStdOutWriterNonFinal(){
+        makeFieldNonFinal(context.getIOAgent(), "stdoutWriter");
+    }
+
+    private Writer replaceWriter(String field, Writer replacement){
+        IOAgent agent = context.getIOAgent();
+        Class<?> cls = agent.getClass();
+        try{
+            Field f =  cls.getDeclaredField(field);
+            f.setAccessible(true);
+            Writer stdErr = (Writer) f.get(agent);
+            f.set(agent, replacement);
+            return stdErr;
+        } catch (IllegalAccessException|NoSuchFieldException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private Writer replaceStdErrWriter(Writer replacement){
+        return replaceWriter("stderrWriter", replacement);
+    }
+
+    private Writer replaceStdOutWriter(Writer replacement){
+        return replaceWriter("stdoutWriter", replacement);
+    }
+
     private void compileStratego(IStrategoRule rule) throws CompilationException {
         File src = new File(compilationPath.getPath().toFile(), rule.getIdentity() + ".str");
         String[] args = new String[]{"-i", src.getAbsolutePath()};
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        PrintWriter writer = new PrintWriter(bos);
+        Writer stdErr = replaceStdErrWriter(writer);
+        Writer stdOut = replaceStdOutWriter(writer);
         try{
             context.invokeStrategyCLI(main_strj_0_0.instance, "Main", args);
         } catch(StrategoExit e){
             if(e.getValue() != 0){
-                throw new CompilationException(e.getMessage());
+                String message = e.getMessage().startsWith("Legal exit") ? new String(bos.toByteArray()) : e.getMessage();
+                throw new CompilationException(message);
             }
         } finally{
+            replaceStdErrWriter(stdErr);
+            replaceStdOutWriter(stdOut);
             context.getIOAgent().closeAllFiles();
         }
     }
