@@ -14,37 +14,35 @@ import java.io.*;
 import java.util.Scanner;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.tools.JavaCompiler;
 
-
+@Named
+@Singleton
 public class StrategoRepl implements IStrategoRepl {
 
     private IStrategoCompiler compiler;
     private IStrategoExecuter executer;
     private ITermHistory history;
-    private int termIdentity;
 
     @Inject
     public StrategoRepl(IStrategoCompiler compiler, IStrategoExecuter executer, ITermHistory history) {
         this.compiler = compiler;
         this.executer = executer;
         this.history = history;
-        termIdentity = 0;
     }
 
-    public void repl() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Stratego> ");
-        IStrategoRule rule = new StrategoRule(scanner.nextLine(), "term_" + termIdentity++);
+    public String repl(IStrategoRule rule) {
+        String result = null;
         try {
             ICompiledStrategoRule compiledRule = compiler.compile(rule);
             IStrategoTerm term = executer.execute(compiledRule);
-            System.out.println(term.getStringRepresentation());
+            result = term.getStringRepresentation();
             history.store(term);
-        } catch (CompilationException e) {
-            System.err.println(e.getMessage());
-        } catch (StrategoExecutionException e) {
-            System.err.println(e.getMessage());
+        } catch (CompilationException|StrategoExecutionException e) {
+            result = e.getMessage();
         }
+        return result;
     }
 }

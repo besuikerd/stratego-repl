@@ -6,8 +6,11 @@ import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.io.*;
 
+@Singleton
 public class MustacheStrategoTemplate implements IStrategoTemplate{
 
     private Mustache mustache;

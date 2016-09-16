@@ -1,20 +1,20 @@
 package com.besuikerd.stratego.repl.compiler;
 
-import com.google.inject.Singleton;
-
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 @Singleton
+@Named
 public class TemporyFilePath implements ICompilationPath {
 
     private final Path path;
 
     public TemporyFilePath() throws IOException {
         this.path = Files.createTempDirectory("stratego-repl");
-        System.out.println(path.toUri());
     }
 
     @Override

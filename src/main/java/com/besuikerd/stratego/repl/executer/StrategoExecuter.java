@@ -10,10 +10,14 @@ import com.besuikerd.stratego.repl.term.StrategoTerm;
 import org.strategoxt.lang.StrategoExit;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.net.MalformedURLException;
 
+@Singleton
+@Named
 public class StrategoExecuter implements IStrategoExecuter{
 
     private MainRunner runner;
@@ -35,7 +39,7 @@ public class StrategoExecuter implements IStrategoExecuter{
             System.setOut(new PrintStream(bos));
             System.setErr(new PrintStream(bos));
             runner.tryMain(rule.getIdentity());
-            return new StrategoTerm(new String(bos.toByteArray()));
+            return new StrategoTerm(rule, new String(bos.toByteArray()));
         } catch (ExecutionException|ClassFunctionException e) {
             try{
                 throw e.getCause();
@@ -45,7 +49,7 @@ public class StrategoExecuter implements IStrategoExecuter{
                     throw new StrategoExecutionException(message);
                 } else{
                     String term = new String(bos.toByteArray()).trim();
-                    return new StrategoTerm(term);
+                    return new StrategoTerm(rule, term);
                 }
             } catch(Throwable e2){
                 throw new StrategoExecutionException(e2.getMessage());
@@ -55,16 +59,4 @@ public class StrategoExecuter implements IStrategoExecuter{
             System.setErr(systemErr);
         }
     }
-
-//    private void executeJava(File src) throws ExecutionException {
-//        String targetCls = src.getName().replaceAll("\\.str$", "");
-//        System.out.println(targetCls);
-//        try {
-//            runner.tryMain(targetCls);
-//        } catch (ExecutionException e) {
-//            throw e;
-//        } catch (ClassFunctionException e) {
-//            e.printStackTrace();
-//        }
-//    }
 }

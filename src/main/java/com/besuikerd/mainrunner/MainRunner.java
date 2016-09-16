@@ -11,8 +11,7 @@ import java.util.Map;
 
 /**
  * Class that can load class files dynamically and execute static functions on
- * the fly. This class uses java reflection to achieve this and should only be
- * used to simplify the debugging of the YAPL compiler.
+ * the fly.
  * @author Nicker
  *
  */

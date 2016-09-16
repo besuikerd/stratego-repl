@@ -2,6 +2,9 @@ group 'com.besuikerd'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName='com.besuikerd.stratego.repl.Main'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -14,9 +17,9 @@ repositories {
   }
 }
 
-jar{
+jar {
   manifest{
-    attributes 'Main-Class': 'Main'
+    attributes 'Main-Class': 'com.besuikerd.stratego.repl.Main'
   }
 
   from {
@@ -27,14 +30,11 @@ jar{
 dependencies {
   testCompile group: 'junit', name: 'junit', version: '4.11'
 
-  compile 'com.fasterxml.jackson.core:jackson-core:2.8.2'
+  compile 'ch.qos.logback:logback-classic:1.1.7'
+  compile 'org.slf4j:jcl-over-slf4j:1.7.21'
   compile 'com.fasterxml.jackson.core:jackson-databind:2.8.2'
-  compile 'com.fasterxml.jackson.core:jackson-annotations:2.8.2'
   compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.8.2'
-
   compile 'com.github.spullara.mustache.java:compiler:0.9.3'
-
-  compile 'com.google.inject:guice:4.1.0'
-
+  compile 'org.springframework.shell:spring-shell:1.2.0.RELEASE'
   compile name: 'strategoxt'
 }

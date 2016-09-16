@@ -13,12 +13,17 @@ import org.strategoxt.lang.StrategoExit;
 import org.strategoxt.strj.main_strj_0_0;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.tools.JavaCompiler;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 
+
+@Singleton
+@Named
 public class StrategoToJBCCompiler implements IStrategoCompiler {
     private ICompilationPath compilationPath;
     private JavaCompiler compiler;
@@ -48,7 +53,7 @@ public class StrategoToJBCCompiler implements IStrategoCompiler {
 
     @Override
     public ICompiledStrategoRule compile(IStrategoRule rule) throws CompilationException {
-        rule = prependHistory(rule);
+        rule = history.createHistoryAwareRule(rule);
         writeStrategoFile(rule);
         compileStratego(rule);
         replaceExitClauses(rule);
@@ -56,10 +61,6 @@ public class StrategoToJBCCompiler implements IStrategoCompiler {
         return new CompiledStrategoRule(rule);
     }
 
-    private IStrategoRule prependHistory(IStrategoRule rule){
-        String prefix = history.hasTerms() ? "!" + history.last().getStringRepresentation() + " ; " : "";
-        return new StrategoRule(prefix + rule.getStringRepresentation(), rule.getIdentity());
-    }
 
     private void writeStrategoFile(IStrategoRule rule) throws CompilationException {
         File destination = new File(compilationPath.getPath().toFile(), rule.getIdentity() + ".str");
@@ -132,7 +133,7 @@ public class StrategoToJBCCompiler implements IStrategoCompiler {
         Writer stdErr = replaceStdErrWriter(writer);
         Writer stdOut = replaceStdOutWriter(writer);
         try{
-            context.invokeStrategyCLI(main_strj_0_0.instance, "Main", args);
+            context.invokeStrategyCLI(main_strj_0_0.instance, "com.besuikerd.stratego.repl.Main", args);
         } catch(StrategoExit e){
             if(e.getValue() != 0){
                 String message = e.getMessage().startsWith("Legal exit") ? new String(bos.toByteArray()) : e.getMessage();
