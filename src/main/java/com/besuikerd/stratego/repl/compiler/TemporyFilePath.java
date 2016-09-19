@@ -9,7 +9,7 @@ import java.nio.file.Path;
 
 @Singleton
 @Named
-public class TemporyFilePath implements ICompilationPath {
+public class TemporyFilePath extends AbstractCompilationPath {
 
     private final Path path;
 
@@ -22,13 +22,4 @@ public class TemporyFilePath implements ICompilationPath {
         return path;
     }
 
-    @Override
-    public String getClassPath(){
-        //include yourself as a classpath dependency when compiling
-        String codeSource = getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
-        String strategoCompiler =
-            codeSource.endsWith(".jar") ? codeSource //ran from jar file
-            : getClass().getClassLoader().getResource("strategoxt.jar").getPath(); //ran during development
-        return strategoCompiler + File.pathSeparatorChar + path.toFile().getAbsolutePath();
-    }
 }

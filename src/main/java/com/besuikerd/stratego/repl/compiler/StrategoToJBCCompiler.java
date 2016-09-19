@@ -16,6 +16,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.tools.JavaCompiler;
+import javax.tools.StandardJavaFileManager;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -160,6 +161,8 @@ public class StrategoToJBCCompiler implements IStrategoCompiler {
     private void compileJava(IStrategoRule rule) throws CompilationException {
         File src = new File(compilationPath.getPath().toFile(), rule.getIdentity() + ".java");
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+        
         int exitCode = compiler.run(nullInput, nullOutput, bos, "-cp", compilationPath.getClassPath(), src.getAbsolutePath());
         if(exitCode != 0){
             throw new CompilationException(new String(bos.toByteArray()));

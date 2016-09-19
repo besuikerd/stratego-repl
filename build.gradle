@@ -3,6 +3,7 @@ version '1.0-SNAPSHOT'
 
 apply plugin: 'java'
 apply plugin: 'application'
+apply plugin: 'idea'
 
 mainClassName='com.besuikerd.stratego.repl.Main'
 
@@ -13,17 +14,7 @@ repositories {
   mavenCentral()
 
   flatDir {
-    dirs 'src/main/resources'
-  }
-}
-
-jar {
-  manifest{
-    attributes 'Main-Class': 'com.besuikerd.stratego.repl.Main'
-  }
-
-  from {
-    configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    dirs 'libs'
   }
 }
 
@@ -37,4 +28,32 @@ dependencies {
   compile 'com.github.spullara.mustache.java:compiler:0.9.3'
   compile 'org.springframework.shell:spring-shell:1.2.0.RELEASE'
   compile name: 'strategoxt'
+}
+
+idea {
+  module {
+    iml {
+      withXml {
+        // Get root of module as groovy.util.Node.
+        def moduleRoot = it.asNode()
+
+        // Find if component with name 'FacetManager'
+        // is already set.
+        def facetManager = moduleRoot.component.find { component -> component.'@name' == 'FacetManager'}
+        if (!facetManager) {
+          // Create new component with name 'FacetManager'
+          facetManager = moduleRoot.appendNode('component', [name: 'FacetManager'])
+        }
+
+        // Find Spring facet it might already be there.
+        def springFacet = facetManager.facet.find { facet -> facet.'@type' == 'Spring' && facet.'@name' == 'Spring' }
+        if (!springFacet) {
+          // If not set create new facet node with name 'Spring'
+          // and type 'Spring' and apply a default configuration.
+          springFacet = facetManager.appendNode('facet', [type: 'Spring', name: 'Spring'])
+          springFacet.appendNode('configuration')
+        }
+      }
+    }
+  }
 }
