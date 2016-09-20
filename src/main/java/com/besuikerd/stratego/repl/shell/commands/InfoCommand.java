@@ -9,8 +9,13 @@ import javax.inject.Inject;
 
 @Component
 public class InfoCommand implements CommandMarker {
-    @Inject
+
     private ITermHistory history;
+
+    @Inject
+    public InfoCommand(ITermHistory history) {
+        this.history = history;
+    }
 
     @CliCommand(value = {":i", ":info"}, help = "Displays the strategy that has been built up thus far")
     public String info(){

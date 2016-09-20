@@ -12,8 +12,12 @@ import java.util.logging.Logger;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class CommandParser extends SimpleParser{
 
-    @Inject
     private ICommandNotFound fallback;
+
+    @Inject
+    public CommandParser(ICommandNotFound fallback) {
+        this.fallback = fallback;
+    }
 
     @Override
     protected void commandNotFound(Logger logger, String command) {

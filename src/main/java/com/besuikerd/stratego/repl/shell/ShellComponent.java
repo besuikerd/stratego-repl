@@ -11,8 +11,12 @@ import javax.inject.Named;
 @Named("shell")
 public class ShellComponent extends JLineShellComponent{
 
-    @Inject
     private SimpleParser parser;
+
+    @Inject
+    public ShellComponent(SimpleParser parser) {
+        this.parser = parser;
+    }
 
     @Override
     protected Parser getParser() {

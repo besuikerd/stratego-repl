@@ -13,11 +13,15 @@ import java.nio.file.Files;
 @Component
 public class ReadFileCommand implements CommandMarker {
 
-    @Inject
     private EvalCommand evalCommand;
 
+    @Inject
+    public ReadFileCommand(EvalCommand evalCommand) {
+        this.evalCommand = evalCommand;
+    }
+
     @CliCommand(value = {":read"}, help = "load an aterm file and construct it")
-    public String readfile(@CliOption(key = "", mandatory = true, help = "file to read") File file){
+    public String readfile(@CliOption(key = "f", mandatory = true, help = "file to read") File file){
         if(!file.exists()){
             return "File not found";
         } else{

@@ -10,8 +10,12 @@ import javax.inject.Inject;
 @Component
 public class CompilationPathCommand implements CommandMarker{
 
-    @Inject
     private ICompilationPath compilationPath;
+
+    @Inject
+    public CompilationPathCommand(ICompilationPath compilationPath) {
+        this.compilationPath = compilationPath;
+    }
 
     @CliCommand(value = ":compilepath", help = "prints out path where intermediate files are compiled to")
     public String compilationPath(){

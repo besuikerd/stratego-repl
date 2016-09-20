@@ -10,8 +10,12 @@ import javax.inject.Inject;
 @Component
 public class ResetCommand implements CommandMarker {
 
-    @Inject
     private ITermHistory history;
+
+    @Inject
+    public ResetCommand(ITermHistory history) {
+        this.history = history;
+    }
 
     @CliCommand(value = ":reset", help = "remove all previous strategies")
     public String reset(){

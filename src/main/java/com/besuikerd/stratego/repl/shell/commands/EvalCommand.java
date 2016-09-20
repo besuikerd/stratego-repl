@@ -18,11 +18,14 @@ import javax.inject.Inject;
 @Component
 public class EvalCommand implements CommandMarker{
 
-    @Inject
     private IStrategoRepl repl;
+    private IStrategoRuleFactory ruleFactory;
 
     @Inject
-    private IStrategoRuleFactory ruleFactory;
+    public EvalCommand(IStrategoRepl repl, IStrategoRuleFactory ruleFactory) {
+        this.repl = repl;
+        this.ruleFactory = ruleFactory;
+    }
 
     @CliCommand(value=":eval", help="evaluates a stratego strategy on the current term")
     public String eval(@CliOption(key = "", mandatory = true) final String input){

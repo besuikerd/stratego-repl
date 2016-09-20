@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ExitCommand implements CommandMarker{
-
     @CliCommand(value={":q", ":exit"}, help="Exits the shell")
     public ExitShellRequest quit() {
         return ExitShellRequest.NORMAL_EXIT;

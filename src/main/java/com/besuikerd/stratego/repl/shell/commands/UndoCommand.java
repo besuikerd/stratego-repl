@@ -11,8 +11,12 @@ import javax.inject.Inject;
 @Component
 public class UndoCommand implements CommandMarker {
 
-    @Inject
     ITermHistory history;
+
+    @Inject
+    public UndoCommand(ITermHistory history) {
+        this.history = history;
+    }
 
     @CliCommand(value = {":undo", ":u"}, help = "undo a certain number of strategies")
     public String undo(@CliOption(key = "", mandatory = false, unspecifiedDefaultValue = "1") final int n){

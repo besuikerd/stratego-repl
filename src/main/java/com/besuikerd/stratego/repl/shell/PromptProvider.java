@@ -9,8 +9,12 @@ import javax.inject.Inject;
 @Component
 public class PromptProvider extends DefaultPromptProvider{
 
-    @Inject
     ITermHistory history;
+
+    @Inject
+    public PromptProvider(ITermHistory history) {
+        this.history = history;
+    }
 
     @Override
     public String getPrompt() {

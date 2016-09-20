@@ -8,8 +8,12 @@ import javax.inject.Named;
 @Named
 public class EvalCommandNotFound implements ICommandNotFound{
 
-    @Inject
     private EvalCommand eval;
+
+    @Inject
+    public EvalCommandNotFound(EvalCommand eval) {
+        this.eval = eval;
+    }
 
     @Override
     public void fallback(String command) {

@@ -11,8 +11,12 @@ import javax.inject.Inject;
 @Component
 public class RedoCommand implements CommandMarker {
 
-    @Inject
     private ITermHistory history;
+
+    @Inject
+    public RedoCommand(ITermHistory history) {
+        this.history = history;
+    }
 
     @CliCommand(value = {":r", ":redo"}, help = "redo a certain number of strategies")
     public String redo(@CliOption(key = "", mandatory = false, unspecifiedDefaultValue = "1") int n){
